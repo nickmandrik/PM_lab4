@@ -397,6 +397,7 @@ int rename_callback(const char* from, const char* to)
 	return 0;
 }
 
+ 
 int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
     off_t offset, struct fuse_file_info *fi)
 {
