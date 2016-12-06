@@ -18,7 +18,7 @@ struct dir_struct {
 	char dir_name[255];
 };
 
-void * init_callback(){
+void * init_callback() {
 	log_file = fopen("filesystem.log", "wb");
 	FILE* file = fopen(FILENAME, "wb");
 	
