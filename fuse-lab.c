@@ -18,7 +18,7 @@ struct dir_struct {
 	char dir_name[255];
 };
 
-void * init_callback() {
+void * init_callback(){
 	log_file = fopen("filesystem.log", "wb");
 	FILE* file = fopen(FILENAME, "wb");
 	
@@ -36,7 +36,9 @@ void * init_callback() {
 	fclose(file);
 	
 	current_dir_amount = 0;
-	return NULL;
+	void* v = NULL; 
+	
+	return v;
 }
 
 void destroy_callback(void* private_data){
@@ -55,7 +57,7 @@ int find(const char* dir, int parent)
 	
 	struct dir_struct ds;
 	
-	memset(&ds, 0, sizeof(struct dir_struct));
+	memset(&ds, 0, sizeof(struct dir_struct)); // заполняет нулями ds
 
 	while(!feof(file) && fread(&ds, sizeof(struct dir_struct), 1, file) > 0) {
 		if (ds.empty == 0 && ds.parent_id == parent && strcmp(ds.dir_name, dir) == 0) {
@@ -159,7 +161,7 @@ int delete(int id)
 	return 0;
 }
 
-int re_name(struct dir_struct *dir)
+int ren_ame(struct dir_struct *dir)
 {
 	FILE* file = fopen(FILENAME, "rb+");
 	
@@ -194,7 +196,7 @@ int find_by_path(const char* path)
 	else 
 	{
 		while(start <= len - 1) {
-			endp = strchr(path + start, '/');
+			endp = strchr(path + start, '/'); // поиск первого вхождения
 			if(endp == NULL) {
 				memset(subdir, 0, 255);
 				strcpy(subdir, path + start);
@@ -277,14 +279,14 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
 	}
 	
 	if (id == -1) {
-		stbuf->st_mode = S_IFDIR | 0755;
+		stbuf->st_mode = S_IFDIR | 0755; // если данный объект является директорией - описываем его как директория
 		stbuf->st_nlink = 2;
 		fprintf(log_file, "----Exit from getattr1: return 0\n");
 		fflush(log_file);
 		return 0;
 	} 
 	
-	stbuf->st_mode = S_IFDIR | 0777;
+	stbuf->st_mode = S_IFDIR | 0755;
     stbuf->st_nlink = 2;
 	
 	fprintf(log_file, "----Exit from getattr2: return 0\n");
@@ -375,7 +377,7 @@ int rename_callback(const char* from, const char* to)
 	if (to_id > -1 && find_child(&ds, to_id, 0) > -1) {
 		return -ENOTEMPTY;
 	}
-	if (strstr(from, to) != NULL) {
+	if (strstr(from, to) != NULL) { // первое вхождение to в from
 		return -EINVAL;
 	}
 	
@@ -392,12 +394,11 @@ int rename_callback(const char* from, const char* to)
 		delete(to_id);
 	}
 	
-	re_name(&ds);
+	ren_ame(&ds);
 	
 	return 0;
 }
 
-         
 int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
     off_t offset, struct fuse_file_info *fi)
 {
@@ -433,5 +434,5 @@ static struct fuse_operations fuse_example_operations = {
 
 int main(int argc, char *argv[])
 {
-  return fuse_main(argc, argv, &fuse_example_operations, NULL);
+  return fuse_main(argc, argv, &fuse_example_operations, NULL); 
 }
